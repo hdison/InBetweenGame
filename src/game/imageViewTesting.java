@@ -26,6 +26,8 @@ import javafx.stage.Stage;
 
 public class imageViewTesting extends Application	
 {
+	private String amount;  // variable to store amount that is bet
+
 	public static void main(String[] args) 
 	{
 		launch(args);
@@ -44,7 +46,7 @@ public class imageViewTesting extends Application
 		lbl.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 		lbl.setAlignment(Pos.TOP_CENTER);
 		//pane.getChildren().add(lbl);
-		
+
 		HBox hb1 = new HBox(5);
 		hb1.setAlignment(Pos.CENTER);
 		hb1.setPadding(new Insets(25));
@@ -59,27 +61,28 @@ public class imageViewTesting extends Application
 		TextField betAmt = new TextField ();
 		betAmt.setMaxWidth(100);
 		betAmt.setVisible(false);  // Use later and set true on deal
-		
+
 		Button dealBtn = new Button();
 		dealBtn.setFont(Font.font("Tahoma", FontWeight.NORMAL, 18));
 		dealBtn.setText("Deal Cards");
-		
+		dealBtn.setWrapText(true);
+
 		// Button to shuffle deck 
 		Button shuffleBtn = new Button("Shuffle Cards");
 		shuffleBtn.setFont(Font.font("Tahoma", FontWeight.NORMAL, 18));
 		shuffleBtn.setStyle("-fx-background-color: yellow");
-		
+
 		TextField filler = new TextField ();
 		filler.setMaxWidth(200);
 		filler.setVisible(false);
-		
+
 		hb1.getChildren().addAll(betLbl, betAmt, dealBtn, shuffleBtn, filler);
-		
+
 		Image image1 = new Image("card_back.png");
 		ImageView imageView1 = new ImageView(image1);
 		imageView1.setFitHeight(130);
 		imageView1.setFitWidth(85);
-		
+
 		HBox hb2 = new HBox(2);
 		hb2.setAlignment(Pos.CENTER);
 		hb2.setPadding(new Insets(25));
@@ -99,7 +102,7 @@ public class imageViewTesting extends Application
 		Button showBtn = new Button();
 		showBtn.setFont(Font.font("Tahoma", FontWeight.NORMAL, 18));
 		showBtn.setText("Show Card");
-		
+
 		// build array of Strings holding card image file names
 		String[] suits = {"hearts", "diamonds", "spades", "clubs"};
 		String[] cards = new String[52];
@@ -109,28 +112,42 @@ public class imageViewTesting extends Application
 		{
 			for(int i = 1; i < 14; i++)
 			{
-				cards[count] = suits[j] + i; // + ".jpg";
+				cards[count] = suits[j] + i; // + ".png";
 				count++;
 			}
 		}
-		
+
 		//imageView4.setImage(new Image("diamonds5.png")); // This works
-//		String card = "diamonds7";
-//		Image myCard = new Image(card + ".png"); // This works
-//		imageView4.setImage(myCard);
-		
-//		FileInputStream inputstream = new FileInputStream("diamonds5.png"); 
-//		Image myCard = new Image(inputstream); 
-//		imageView4.setImage(myCard);
-		
-//		// Pick an create a card to display
-//		int val = (int)(Math.random() * 52 + 1);
-//		Image card = new Image(cards[val]);
-//		imageView4.setImage(card);
+		//		String card = "diamonds7";
+		//		Image myCard = new Image(card + ".png"); // This works
+		//		imageView4.setImage(myCard);
+
+		//		FileInputStream inputstream = new FileInputStream("diamonds5.png"); 
+		//		Image myCard = new Image(inputstream); 
+		//		imageView4.setImage(myCard);
+
+		//		// Pick an create a card to display
+		//		int val = (int)(Math.random() * 51 + 1);
+		//		Image card = new Image(cards[val]);  // Why doesn't this work?!
+		//		imageView4.setImage(card);
 
 		//		// Display image names to error check.
 		//		for(int i = 0; i < 52; i++)
 		//			System.out.println(cards[i]);
+
+		//-------------------- EVENT HANDLERS  --------------------------//
+
+		// Read bet amount and DO STUFF
+		// Make the textField and label invisible again //
+		betAmt.setOnAction(new EventHandler<ActionEvent>() 
+		{
+			@Override   
+			public void handle(ActionEvent event) 
+			{
+				amount = betAmt.getText();
+				betLbl.setText("Thanks for your $" + amount + " donation!");
+			}
+		});
 
 		//use Lambda expressions for button event handling
 		showBtn.setOnAction((ActionEvent event) -> 
@@ -142,7 +159,7 @@ public class imageViewTesting extends Application
 			betAmt.setVisible(false);
 			betLbl.setVisible(false);
 		});
-		
+
 		dealBtn.setOnAction((ActionEvent event) -> 
 		{
 			// Pick an create a card to display
