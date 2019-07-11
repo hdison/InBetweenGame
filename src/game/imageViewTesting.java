@@ -47,6 +47,7 @@ public class imageViewTesting extends Application
 		lbl.setAlignment(Pos.TOP_CENTER);
 		//pane.getChildren().add(lbl);
 
+		// Create YES/NO Buttons to play or not
 		HBox hb1 = new HBox(5);
 		hb1.setAlignment(Pos.CENTER);
 		hb1.setPadding(new Insets(25));
@@ -162,7 +163,7 @@ public class imageViewTesting extends Application
 
 		dealBtn.setOnAction((ActionEvent event) -> 
 		{
-			// Pick an create a card to display
+			// Pick and create a card to display
 			int val1 = (int)(Math.random() * 51 + 1);
 			int val2 = (int)(Math.random() * 51 + 1);
 			Image card1 = new Image(cards[val1] + ".png");
