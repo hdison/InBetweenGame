@@ -11,7 +11,7 @@ import java.util.Scanner;
  * @author Allison Rojewski
  * @date
  */
-public class House {
+public class House_7_9 {
 
 	// Constants //
 
@@ -31,7 +31,7 @@ public class House {
 	 * Deck object
 	 * @param buyIn The amount of money to add to the pot per player
 	 */
-	public House(double buyIn) 
+	public House_7_9(double buyIn) 
 	{
 		pot = buyIn * NUM_PLAYERS; // Sets the pot as number of players * buyIn
 		deck = new Deck();         // Generates the deck for play

@@ -9,10 +9,9 @@ package game;
  * @author Luke Dantuono
  * Date: 3 July 2019
  */
-public class Card 
-{
+public class Card {
     
-    enum Suit {clubs, spades, diamonds, hearts};
+    enum Suit {clubs,spades,diamonds,hearts};
     private Suit suit;
     private int face;
 
@@ -27,28 +26,37 @@ public class Card
     
     
     /**
-     * Constructor used to load a deck of 52 card. Random values are fed in 
-     * (between 1 and 52) and logic determines face value and suit. There should 
+     * Constructor used to load a deck of 52 card. Random values are fed in
+     * (between 1 and 52) and logic determines face value and suit. There should
      * be no duplicate values at this point.
      * @param value - new card value as an int
      */
-    public Card(int value){
-        if(value < 14){
+    public Card(int value) {
+        if (value < 14) {
             this.suit = Suit.clubs;
             this.face = value;
-        }
-        else if(value > 13 && value < 27){
+            if (this.face == 1) {
+                this.setFace(14);
+            }
+        } else if (value > 13 && value < 27) {
             this.suit = Suit.spades;
             this.face = value - 13;
-        }
-        else if(value > 26 && value < 40){
+            if (this.face == 1) {
+                this.setFace(14);
+            }
+        } else if (value > 26 && value < 40) {
             this.suit = Suit.diamonds;
             this.face = value - 26;
-        }
-        else if(value > 39 && value < 53){
+            if (this.face == 1) {
+                this.setFace(14);
+            }
+        } else if (value > 39 && value < 53) {
             this.suit = Suit.hearts;
             this.face = value - 39;
-        }         
+            if (this.face == 1) {
+                this.setFace(14);
+            }
+        }
     }//End of constructor
     
     
@@ -163,14 +171,3 @@ public class Card
 
 
 
-
-//Left overs
-
-    //constructor manual (may delete)
-    /*
-    public Card(Enum suit, int face) {
-        this.suit = suit;
-        this.face = face;
-    }//end of constructor
-
-    */

@@ -1,7 +1,6 @@
 package game;
 
 //EDITED BY HOLLY ON 7/10 
-//-- Working on getting bet from GUI rather than console //
 
 /**
  * Person Class
@@ -11,7 +10,8 @@ package game;
  * @author Allison Rojewski
  * @date
  */
-public class Person implements Comparable<Person> {
+public class Person implements Comparable<Person> 
+{
     
     // Instance Fields //
     
@@ -59,7 +59,8 @@ public class Person implements Comparable<Person> {
      * setActivePlayer Mutator
      * Description: Reverses the logical value of the activePlayer variable.
      */
-    public void setActivePlayer() {
+    public void setActivePlayer() 
+    {
         activePlayer = !activePlayer;
     }
     

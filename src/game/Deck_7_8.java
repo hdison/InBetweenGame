@@ -7,7 +7,7 @@ import java.util.Iterator;
  * @author Luke Dantuono
  * Date: 3 June 2019
  */
-public class Deck implements Iterator{
+public class Deck_7_8 implements Iterator{
 
     final private int DECK_SIZE = 52; //size of deck 
     private Card[] deck; // an array of Card objects
@@ -15,15 +15,11 @@ public class Deck implements Iterator{
     private Random rand = new Random(); //random number object
     private int stackCount; // Counts how many cards in deck
     
-    
-    //Constructor//
-    
-    
     /**
      * Constructor method. Builds the deck according to the random generator
      * using isAvailable() method.
      */
-    public Deck() {
+    public Deck_7_8() {
         deck = new Card[DECK_SIZE];
 
         //load deck with randomly controled cards

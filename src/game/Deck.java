@@ -16,10 +16,6 @@ public class Deck implements Iterator
     private Random rand = new Random(); //random number object
     private int stackCount; // Counts how many cards in deck
     
-    
-    //Constructor//
-    
-    
     /**
      * Constructor method. Builds the deck according to the random generator
      * using isAvailable() method.

@@ -22,6 +22,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.layout.Pane;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 
 import javafx.stage.Stage;
@@ -29,62 +30,48 @@ import javafx.stage.Stage;
 public class GameGui extends Application	
 {
 
-	private double amount;  // variable to store amount that is bet
-	private String btwn = "Not between";
+	//private double amount;  // variable to store amount that is bet
+	private String amount;  // variable to store amount that is bet
+	private String btwnMsg = "";
 	private House house;
 	private Card Card1;
 	private Card Card2;
 	private Card Card3;
 	private Person p1;
 	private Person p2;
+	private Person p3;
+	private Person p4;
 	private String p1Name;
 	private String p2Name;
+	private String p3Name;
+	private String p4Name;
+	private Person[] players = {p1, p2, p3, p4};
+	private Person currentPlayer;
+	private int playerIndex = 0;
+	private int numPlayers = 0;
+	private int count = 0;
 	private boolean done = false;
+	private boolean firstRound = true;
+
 
 	public static void main(String[] args) 
 	{
 		launch(args);	
 	}
 
-	public void gameDriver() throws IllegalBetException 
-	{
-		Scanner stdin = new Scanner(System.in);
-		String input;
-
-		do {
-			house.playHand(p1);
-			if (!p1.getActivePlayer()) {
-				done = true;
-			} else if (house.getPot() == 0) {
-				done = true;
-			}
-			else {
-				System.out.println("The pot is now at " + house.getPot());
-				System.out.println("Press return to continue or any key " +
-						"to quit");
-				input = stdin.nextLine();
-				if (input.length() > 0) {
-					done = true;
-				}
-			}
-		} while (!done);
-		if (p1.getBankroll() <= 0) {
-			System.out.println("You lose! Better luck next time.");
-		} else if (house.getPot() <= 0) {
-			System.out.println("You win!");
-		}	
-	}
-
 	@Override
 	public void start(Stage stage) throws FileNotFoundException,  IllegalBetException 
 	{
-		//gameDriver();
-
 		stage.setTitle("Let's Play In-Between!");
+
+		final Scene scene = new Scene(new Group(), 700, 550);
+		scene.setFill(Color.LIGHTGREEN);
 
 		VBox pane = new VBox(2);
 		pane.setAlignment(Pos.TOP_CENTER);
-		Scene scene = new Scene(pane, 700, 550);
+		((Group)scene.getRoot()).getChildren().add(pane);
+
+		//Scene scene = new Scene(pane, 700, 550); // How I had it originally
 
 		// Main grid to display cards and  include player names, input, 
 		// error messages etc
@@ -148,54 +135,62 @@ public class GameGui extends Application
 		p1Amt.setFont(Font.font("Tahoma", FontWeight.BOLD, 16));
 		p1Amt.setTextFill( Color.BLACK );
 		p1Amt.setWrapText(true);
+		p1Amt.setVisible(false);
 
 		//------------   PLAYER 2 LABELS, TEXTBOXES AND BUTTONS --------------//
-		// Label and textbox for player2 to enter their name
+		// Textbox for player2 to enter their name
 		Label p2Lbl = new Label("Player 2 \n What is your name?");
 		p2Lbl.setFont(Font.font("Tahoma", FontWeight.BOLD, 16));
 		p2Lbl.setTextFill( Color.GREEN );
 		p2Lbl.setWrapText(true);
-		p2Lbl.setVisible(true); // Change text to name after it's entered
+		p2Lbl.setVisible(false); 
 
 		TextField p2Txt = new TextField ();
 		p2Txt.setMaxWidth(100);
-		p2Txt.setVisible(true);  // Set false after name is entered
+		p2Txt.setVisible(false);  
+
+		Label betLbl2 = new Label();
+		betLbl2.setAlignment(Pos.TOP_CENTER);
+		betLbl2.setFont(Font.font("Tahoma", FontWeight.BOLD, 16));
+		betLbl2.setWrapText(true);
+		betLbl2.setVisible(false);
 
 		Label p2Amt = new Label("Player 2 Bankroll = $100"); 
 		p2Amt.setFont(Font.font("Tahoma", FontWeight.BOLD, 16));
 		p2Amt.setTextFill( Color.BLACK );
 		p2Amt.setWrapText(true);
+		p2Amt.setVisible(false);
 
 		// Left Message Label 
 		Label msgLbl1 = new Label();
 		msgLbl1.setAlignment(Pos.TOP_CENTER);
 		msgLbl1.setFont(Font.font("Tahoma", FontWeight.BOLD, 16));
 		msgLbl1.setWrapText(true);
-		msgLbl1.setVisible(false); // Use later and set visibility in handlers
+		msgLbl1.setVisible(false); // Reset visibility in handlers
 
-		// Middle Message Label 
-		Label msgLbl2 = new Label();
-		msgLbl2.setAlignment(Pos.TOP_CENTER);
-		msgLbl2.setFont(Font.font("Tahoma", FontWeight.BOLD, 16));
-		msgLbl2.setWrapText(true);
-		msgLbl2.setVisible(false); // Use later and set visibility in handlers
+		// ----------------- Middle Message Labels -----------------//
+		// Exception/Win/Lose messages
+		Label msgLbl2a = new Label();
+		msgLbl2a.setTextFill( Color.CRIMSON);
+		msgLbl2a.setFont(Font.font("Tahoma", FontWeight.BOLD, 20));
+		msgLbl2a.setWrapText(true);
+		msgLbl2a.setVisible(false); // Reset visibility in handlers
+		grid.setHalignment(msgLbl2a, HPos.CENTER);
 
-		// Textbox for Player to enter their bet
-		TextField bet1Txt = new TextField ();
-		bet1Txt.setMaxWidth(100);
-		bet1Txt.setAlignment(Pos.TOP_CENTER);
-		bet1Txt.setVisible(false);  // Set true after deal
+		// Do you want to play message 
+		Label msgLbl2b = new Label();
+		msgLbl2b.setAlignment(Pos.TOP_CENTER);
+		msgLbl2b.setFont(Font.font("Tahoma", FontWeight.BOLD, 16));
+		msgLbl2b.setWrapText(true);
+		msgLbl2b.setVisible(false); // Reset visibility in handlers
+		// ---------------------------------------------------------//
 
-		// Label and textbox for Player 2 to enter their bet
-		Label bet2Lbl = new Label("Place your bet!");
-		bet2Lbl.setFont(Font.font("Tahoma", FontWeight.BOLD, 16));
-		bet2Lbl.setTextFill( Color.RED);
-		bet2Lbl.setWrapText(true);
-		bet2Lbl.setVisible(false); // Use later and set true on deal
-
-		TextField bet2Txt = new TextField ();
-		bet2Txt.setMaxWidth(100);
-		bet2Txt.setVisible(false);  // Set true after deal
+		// Right Message Label
+		Label msgLbl3 = new Label();
+		msgLbl3.setAlignment(Pos.TOP_CENTER);
+		msgLbl3.setFont(Font.font("Tahoma", FontWeight.BOLD, 16));
+		msgLbl3.setWrapText(true);
+		msgLbl3.setVisible(false); // Reset visibility in handlers
 
 		// Deal button to play a hand
 		Button dealBtn = new Button();
@@ -204,32 +199,55 @@ public class GameGui extends Application
 		dealBtn.setWrapText(true);
 		dealBtn.setVisible(false); // Make visible when player says yes
 
+		// Textbox for Player to enter their bet
+		TextField betTxt = new TextField ();
+		betTxt.setMaxWidth(100);
+		betTxt.setAlignment(Pos.TOP_CENTER);
+		betTxt.setVisible(false);  // Set true after deal
+
+		// Label message for Player 2 to enter their bet
+		Label bet2Lbl = new Label("Place your bet!");
+		bet2Lbl.setFont(Font.font("Tahoma", FontWeight.BOLD, 16));
+		bet2Lbl.setTextFill( Color.RED);
+		bet2Lbl.setWrapText(true);
+		bet2Lbl.setVisible(false); // Use later and set true on deal
+
+		// Label to show error message after bet exception
+		Label errLbl = new Label(); 
+		errLbl.setFont(Font.font("Tahoma", FontWeight.BOLD, 16));
+		errLbl.setTextFill( Color.FIREBRICK );
+		errLbl.setWrapText(true);
+		errLbl.setVisible(false);
+
+		// Label to show current amount in pot
 		Label houseAmt = new Label(); 
 		houseAmt.setFont(Font.font("Tahoma", FontWeight.BOLD, 16));
 		houseAmt.setTextFill( Color.BLACK );
 		houseAmt.setWrapText(true);
 		houseAmt.setVisible(false);
 
-		Image image1 = new Image("card_back.png");
-		ImageView imageView1 = new ImageView(image1);
-		imageView1.setFitHeight(130);
-		imageView1.setFitWidth(85);
-		imageView1.setVisible(false);
+		// Back of card image object
+		Image backOfCard = new Image("card_back.png");
 
 		HBox hb2 = new HBox(2);
 		hb2.setAlignment(Pos.CENTER);
 		hb2.setPadding(new Insets(25));
 
-		ImageView imageView2 = new ImageView(image1);
+		ImageView imageView2 = new ImageView(backOfCard);
 		imageView2.setFitHeight(130);
 		imageView2.setFitWidth(85);
 		hb2.getChildren().add(imageView2);
 
-		ImageView imageView3 = new ImageView(image1);
+		ImageView imageView3 = new ImageView(backOfCard);
 		imageView3.setFitHeight(130);
 		imageView3.setFitWidth(85);
 		hb2.getChildren().add(imageView3);
 		hb2.setVisible(false);
+
+		ImageView imageView1 = new ImageView(backOfCard);
+		imageView1.setFitHeight(130);
+		imageView1.setFitWidth(85);
+		imageView1.setVisible(false);
 
 
 		// ----------  ADD COMPONENTS TO THE GRID -----------  //
@@ -242,9 +260,11 @@ public class GameGui extends Application
 		grid.add(p1Amt, 0, 4);
 
 		// Middle portion (Message to player and Card Display)	
-		grid.add(bet1Txt, 1, 1);
 		grid.add(dealBtn, 1, 0);
-		grid.add(msgLbl2, 1, 2);
+		grid.add(errLbl, 1, 0);		// Same location, alternate visibility
+		grid.add(betTxt, 1, 1);
+		grid.add(msgLbl2a, 1, 1); 	// Same location, alternate visibility
+		grid.add(msgLbl2b, 1, 2);
 		grid.add(hb2, 1, 2); 		// Same location, alternate visibility
 		grid.add(hb1, 1, 3);
 		grid.add(imageView1, 1, 3);	// Same location, alternate visibility
@@ -253,8 +273,9 @@ public class GameGui extends Application
 		// Right portion (Player 2) 
 		grid.add(p2Lbl, 2, 0);
 		grid.add(p2Txt, 2, 1);
-		grid.add(bet2Lbl, 2, 2);
-		grid.add(bet2Txt, 2, 3);
+		grid.add(betLbl2, 2, 1); // Same location, must alternate visibility
+		grid.add(msgLbl3, 2, 2);
+		// Nothing in (2, 3) yet
 		grid.add(p2Amt, 2, 4);
 
 		grid.setGridLinesVisible(true);
@@ -273,8 +294,8 @@ public class GameGui extends Application
 				p1Name = p1Txt.getText();
 				p1Lbl.setText(p1Name);
 				p1Txt.setVisible(false);
-				msgLbl2.setVisible(true);
-				msgLbl2.setText("You start with $100. \nThe buy-in is $20." + 
+				msgLbl2b.setVisible(true);
+				msgLbl2b.setText("You start with $100. \nThe buy-in is $20." + 
 						"\nDo you wish to play?"); 
 				hb1.setVisible(true);  	// Yes/No buttons
 			}
@@ -288,67 +309,144 @@ public class GameGui extends Application
 				p2Name = p2Txt.getText();
 				p2Lbl.setText(p2Name);
 				p2Txt.setVisible(false);
-				
+
 				// Change visibility of middle panel components
 				dealBtn.setVisible(false);
 				hb2.setVisible(false);
 				imageView1.setVisible(false);
-				msgLbl2.setVisible(true);
-				msgLbl2.setText("You start with $100. \nThe buy-in is $20." + 
+				msgLbl2b.setVisible(true);
+				msgLbl2b.setText("You start with $100. \nThe buy-in is $20." + 
 						"\nDo you wish to play?");
 				hb1.setVisible(true); 	// Yes/No buttons
 			}
 		});
 
 		yesBtn.setOnAction((ActionEvent event) -> 
-		{
-			// Initialize player and pot
-			// ** Later will need to specify which player **
-			p1 = new Person(p1Name, 100);
-			p1.setBuyIn(20);
-			house = new House(20);
-			p1Amt.setText(p1.getName() + " Bankroll = $" + p1.getBankroll()); 
-			houseAmt.setText("Current Pot = $" + house.getPot()); 
+		{	
 
-			//yesBtn.setVisible(false);
-			//noBtn.setVisible(false);
-			msgLbl1.setTextFill( Color.RED );
-			msgLbl1.setText("Great! Let's play!");
+			// Setup Player 1 and then ask for Player 2s name
+			if(playerIndex == 0)
+			{
+				p1 = new Person(p1Name, 100);
+				p1.setBuyIn(20);
+				players[0] = p1;
+
+				p1Amt.setText(players[0].getName() + " Bankroll = $" + p1.getBankroll()); 
+
+				p1Amt.setVisible(true);
+
+				msgLbl1.setTextFill( Color.RED );
+				msgLbl1.setText("Great! Let's play!");
+
+				p2Lbl.setVisible(true); 
+				p2Txt.setVisible(true); 
+				numPlayers++;
+
+			}
+			else if (playerIndex == 1)
+			{
+				p2 = new Person(p2Name, 100);
+				p2.setBuyIn(20);
+				players[1] = p2;
+
+				p2Amt.setText(players[1].getName() + " Bankroll = $" 
+						+ players[1].getBankroll()); 
+
+				p2Amt.setVisible(true);
+
+				msgLbl3.setTextFill( Color.DARKRED);
+				msgLbl3.setText("Great! Let's play!");
+				numPlayers++;
+			}
 
 			// Hide Yes/No buttons and starting buy-in message:
-			msgLbl2.setVisible(false);
+			msgLbl2b.setVisible(false);
 			hb1.setVisible(false);
 
-			//Show deal button, backs of first two cards, and current pot
-			dealBtn.setVisible(true);
-			hb2.setVisible(true);			// Backs of first two cards
-			imageView1.setVisible(true); 	// Back of third card
-			houseAmt.setVisible(true);
+			if(playerIndex == 1) // If both players have been invited
+			{
+				//Initialize house object and show current pot
+				house = new House(20, numPlayers);
+				houseAmt.setVisible(true);
+				houseAmt.setText("Current Pot = $" + house.getPot());
 
+				//Show deal button, backs of first two cards, and current pot
+				dealBtn.setVisible(true);
+				hb2.setVisible(true);			// Backs of first two cards
+				imageView1.setVisible(true); 	// Back of third card
+			}
+
+			playerIndex++;
 		});
 
 		noBtn.setOnAction((ActionEvent event) -> 
 		{
-			yesBtn.setVisible(false);
-			noBtn.setVisible(false);
-			msgLbl2.setText("Smart Choice! \nGambling is bad "
-					+ "\nfor your health!");
+			// Hide Yes/No buttons and starting buy-in message:
+			msgLbl2b.setVisible(false);
+			hb1.setVisible(false);
+
+			if (playerIndex == 0)
+			{
+				msgLbl1.setVisible(true);
+				msgLbl1.setText("Smart Choice! \nGambling is bad "
+						+ "\nfor your health!");
+			}
+			else if(playerIndex == 1) // If both players have been invited
+			{
+				// Show message and hide Player2 if they chose not to play
+				msgLbl3.setVisible(true);
+				msgLbl3.setText("Smart Choice! \nGambling is bad "
+						+ "\nfor your health!");
+				p2Lbl.setVisible(false);
+				p2Txt.setText("");
+				p2Txt.setVisible(false);
+
+				//Initialize house object and show current pot
+				house = new House(20, numPlayers);
+				houseAmt.setVisible(true);
+				houseAmt.setText("Current Pot = $" + house.getPot()); 
+
+				//Show deal button, backs of first two cards, and current pot
+				dealBtn.setVisible(true);
+				hb2.setVisible(true);			// Backs of first two cards
+				imageView1.setVisible(true); 	// Back of third card 
+			}
 
 		});
 
 		dealBtn.setOnAction((ActionEvent event) -> 
-		{
-			// ** Get current player, show first two non-equal cards
-			Person currentPlayer = p1; // ** Need to determine who is current player
+		{// ** Get current player, show first two non-equal cards
 
-			if (!currentPlayer.getActivePlayer()) 
+			System.out.println("numPlayers = " + numPlayers);
+
+			// If its first hand played or if we've reached last player
+			// then go back to first player
+
+			if(firstRound || playerIndex == (numPlayers - 1))
 			{
-				return;     // If the current player isn't active, skip them
+				playerIndex = 0; 
+				firstRound = false;
 			}
-			do {
-				Card1 = house.dealCard();       // Deal first card
-				Card2 = house.dealCard();       // Deal second card
-			} while (Card1.equals(Card2)); 
+			else if (numPlayers > 0)
+			{
+				playerIndex++;
+			}
+
+			// Clear any textboxes and don't gamble message if needed
+			betTxt.setText("");
+			msgLbl3.setText("");
+			msgLbl2a.setVisible(false);
+
+			// ** Need to determine who is current player and set accordingly
+
+			currentPlayer = players[playerIndex];
+
+			System.out.println("playerIndex = " + playerIndex);
+			System.out.println("player = " + currentPlayer.getName());
+
+			house.dealHandGUI(currentPlayer);
+			Card1 = house.getCard1();      	//Get first card         
+			Card2 = house.getCard2();       //Get second card
 
 			// Get card images to display
 			Image card1 = new Image("" + Card1.getSuit() + Card1.getFace() + ".png");
@@ -357,73 +455,176 @@ public class GameGui extends Application
 			imageView3.setImage(card2);
 			imageView1.setImage(new Image("card_back.png"));
 
-			// Show textbox for player to enter bet amount
-			betLbl1.setVisible(true);
-			betLbl1.setText("Place your bet!");
-			bet1Txt.setVisible(true);
+
+			// Ask correct player for their bet
+			if(playerIndex == 0)
+			{
+				betLbl1.setVisible(true);
+				//betLbl2.setVisible(false); // Should already be set false in bet
+				betLbl1.setText("Place your bet!");
+			}
+			else if(playerIndex == 1)
+			{
+				//betLbl1.setVisible(false); // Should already be set false in bet
+				betLbl2.setVisible(true);
+				betLbl2.setText("Place your bet!");
+			}
+			//			else if{playerIndex == 2}  // DON'T HAVE PLAYER 3 or 4 YET
+			//			{
+			//				betLbl1.setVisible(false);
+			//				betLbl2.setVisible(false);	
+			//				betLbl3.setVisible(true); // ONLY SHOW PLAYER 3
+			//				betLbl3.setText("Place your bet!");
+			//			}
+			//			else if{playerIndex == 3}
+			//			{
+			//				betLbl1.setVisible(false);
+			//				betLbl2.setVisible(false);
+			//				betLbl3.setVisible(false);
+			//				betLbl4.setVisible(true);
+			//				betLbl4.setText("Place your bet!");
+			//			}
+
+			// Show textbox for current player to enter bet amount
+			betTxt.setVisible(true);
+
 		});
 
 		// Get bet amount from player and show third card
 		// Update player bankroll and current pot amount accordingly
 		// Make the textField and label invisible again //
-		bet1Txt.setOnAction(new EventHandler<ActionEvent>() 
+		betTxt.setOnAction(new EventHandler<ActionEvent>() 
 		{
 			@Override   
 			public void handle(ActionEvent event) 
 			{
-				// ?? Error handling??
-				// ?? How do I repeat input for text box ?? 
-				//boolean isValid = false;
-				//do {
-
-				amount = Double.parseDouble(bet1Txt.getText()); 
+				amount = betTxt.getText(); 
 				try 
 				{
-					p1.setBet(amount); 
+					house.playHandGUI(currentPlayer, amount);	  
 				}
 				catch (IllegalBetException e)
 				{
-					//System.out.println(e);
-					msgLbl1.setText(e.getMessage());
+					System.out.println(e);
+					msgLbl2a.setVisible(false); 
+					betTxt.setText("");  	// Clear bet amount
+					dealBtn.setVisible(false);
+					errLbl.setVisible(true);
+					errLbl.setText(e.getMessage()); 
+
+					return;  // Stop flow to let user re-enter bet amount 
 				}
 
-				//	} while (!isValid);
-				msgLbl1.setText("Thanks for your $" + amount + " donation!");
+				errLbl.setVisible(false);
+				dealBtn.setVisible(true);
 
 				// Get and display third card
-				Card3 = house.dealCard();
+				Card3 = house.getCard3();
 				Image card3 = new Image("" + Card3.getSuit() + 
 						Card3.getFace() + ".png");
-
 				imageView1.setImage(card3);
 
-				//(THIS NEEDS TO USE A HOUSE METHOD RATHER THAN DO IT HERE!) 
-				// This is incomplete and doesn't account for match etc
-				//Is third card in between  
-				if (Card3.compareTo(Card1) == 1
-						&& Card3.compareTo(Card2) == -1
-						|| Card3.compareTo(Card1) == -1
-						&& Card3.compareTo(Card2) == 1) 
-				{ 
-					btwn = "The third card IS in between";
-					
-					p1.setBankroll(amount); // Why isn't this right? 
-					p1Amt.setText(p1.getName() + " Bankroll = $" 
-							+ p1.getBankroll());
+				if(house.isBtwn())
+				{
+					btwnMsg = " Your card IS in between ";
 				}
 				else
 				{
-					btwn = "The third card is NOT in between";
-					p1.setBankroll(-amount); // Why isn't this right? 
-					p1Amt.setText(p1.getName() + " Bankroll = $" 
-							+ p1.getBankroll());	
+					btwnMsg = " Your card is NOT in between ";
 				}
 
-				bet1Txt.setVisible(false);
-				msgLbl1.setVisible(true);
-				msgLbl1.setText(btwn);
+				// Get and re-display amount for current player and pot
+
+				switch(playerIndex)
+				{
+				case 0:
+					p1Amt.setText(players[0].getName() + " Bankroll = $" 
+							+ players[0].getBankroll());
+					break;
+				case 1:
+					p2Amt.setText(players[1].getName() + " Bankroll = $" 
+							+ players[1].getBankroll());
+					break;
+					//					case 2:
+					//						p3Amt.setText(players[2].getName() + " Bankroll = $" 
+					//								+ players[2].getBankroll());
+					//						break;
+					//					case 3:
+					//						p4Amt.setText(players[3].getName() + " Bankroll = $" 
+					//								+ players[3].getBankroll());
+					//						break;
+				}
+
+				// Get and re-display current amount in pot
+				houseAmt.setText("Current Pot = $" + house.getPot()); 
+
+
+				if(house.getPot() == 0)
+				{
+					//Determine winner by checking who has largest bankroll
+					int i = findLargest(); 
+
+					System.out.println ("YOU WIN!");
+					betTxt.setVisible(false);
+					msgLbl2a.setVisible(true);
+					msgLbl2a.setText(players[i].getName() + " You WIN the game!");
+					dealBtn.setVisible(false);
+
+				}
+				else if (currentPlayer.getBankroll() <= 0)  
+				{//*Note player bankroll can go negative if they lose double 
+
+					betTxt.setVisible(false);
+					msgLbl2a.setVisible(true);
+					msgLbl2a.setText(currentPlayer.getName() + " YOU LOSE!");
+					dealBtn.setVisible(false);
+				}
+				else 
+				{
+					betTxt.setVisible(false);
+					msgLbl2a.setVisible(true);
+					msgLbl2a.setText(btwnMsg);
+
+					// Turn off "Place Bet" Message after current player
+					// Completes their hand
+					switch(playerIndex)
+					{
+					case 0:
+						betLbl1.setVisible(false);
+						break;
+					case 1:
+						betLbl2.setVisible(false);
+						break;
+						//						case 2:  // HAVEN'T MADE PLAYER 3 or 4 yet!
+						//							betLbl3.setVisible(false);
+						//							break;
+						//						case 3:
+						//							betLbl4.setVisible(false);
+					}
+
+				}
+				// NOT DONE YET! STILL NEED TO EDIT TO GENERALIZE PLAYER!	
 			}
 		});
+	}
+
+	/**
+	 * findLargest locates the largest integer in the array 
+	 * @return index of largest value found after specified location
+	 */
+	private int findLargest() 
+	{
+		int largest = 0;
+
+		for (int i = 1; i < numPlayers; i++) 
+		{
+			if(players[i].getActivePlayer())
+			{
+				if (players[i].getBankroll() > players[largest].getBankroll())
+					largest = i;
+			}
+		}
+		return largest;
 	}
 }
 
