@@ -15,31 +15,31 @@ import java.awt.event.*;
  * @author Allison Rojewski
  * @date
  */
-public class House {
+public class House2 
+{
     
     // Constants // 
     private static final double MIN_BET = 5.0; // Minimum bet
     
     // Instance Fields //
     
-    private double pot;         // The amount of money in the pot
-    private Deck deck;          // The deck of Cards in play
-    private Card card1;         // The first card dealt
-    private Card card2;         // The second card dealt
-    private Card card3;         // The third card dealt
-    private double playerBet;   // The player's current bet
-    private boolean btwn; 		// Flag whether card3 is in-between or not
-                                // (used exclusively in GUI version)    
+    private double pot;     // The amount of money in the pot
+    private Deck deck;      // The deck of Cards in play
+    private Card card1;
+    private Card card2;
+    private Card card3;
+    private double playerBet;
+    private boolean btwn; 	//flag whether card3 is between or not (for GUI)
+    
     // Constructors //
     
     /**
      * House Constructor
      * Description: Sets up the initial pot for the game and initializes the
-     * Deck object. Assumes one player. Used in the GameDriver test class
-     * for the House and Person classes.
+     * Deck object. Assumes one player.
      * @param buyIn The amount of money to add to the pot per player
      */
-    public House(double buyIn) {
+    public House2(double buyIn) {
         pot = buyIn;               // Sets the pot equal to the buy in
         deck = new Deck();         // Generates the deck for play
     }
@@ -51,7 +51,7 @@ public class House {
      * @param buyIn The amount of money to add to the pot per player
      * @param numPlayers The number of players
      */
-    public House(double buyIn, int numPlayers) {
+    public House2(double buyIn, int numPlayers) {
         pot = buyIn * numPlayers; // Sets the pot as number of players * buyIn
         deck = new Deck();         // Generates the deck for play
     }
@@ -152,11 +152,6 @@ public class House {
         this.card3 = card3;
     }
 
-    /**
-     * isBtwn Method
-     * Returns the status of the btwn flag.
-     * @return The current value of the boolean btwn field
-     */
     public boolean isBtwn()
     {
     	return btwn;
@@ -175,8 +170,8 @@ public class House {
         do {
             card1 = dealCard();             // Deal first card
             card2 = dealCard();             // Deal second card
-        } while (card1.compareTo(card2) == 0); // Keep dealing until 
-    }                                          // card1 != card2
+        } while (card1.compareTo(card2) == 0); // Keep dealing until card1 != card2
+    }
     
     /**
      * playHandGUI Method
@@ -202,18 +197,13 @@ public class House {
                                                     throws IllegalBetException {
         playerBet = getBetGUI(currentPlayer, input);  // Get player's bet
         card3 = dealCard();                 // Deal the third card
+        btwn = false;		// Added by Holly for her GUI
+        
         // If third card matches either first or second card,
-        // player loses twice their bet (if their bankroll has this amount,
-        // otherwise the player busts and their bankroll is added to pot).
-         if (card3.compareTo(card1) == 0 || card3.compareTo(card2) == 0) {
-            if ((2.0 * playerBet) > currentPlayer.getBankroll()) {
-                pot += currentPlayer.getBankroll();
-                currentPlayer.setBankroll(-currentPlayer.getBankroll());
-            } else {
-                currentPlayer.setBankroll(2.0 * -playerBet);
-                pot += (playerBet * 2.0);
-            }
-            btwn = false;
+        // player loses twice their bet
+        if (card3.compareTo(card1) == 0 || card3.compareTo(card2) == 0) {
+            currentPlayer.setBankroll(2.0 * -playerBet);
+            pot += (playerBet * 2.0);
         // If third card is in between first and second card, player wins
         // their bet
         } else if (((card3.compareTo(card1) == -1) 
@@ -222,13 +212,12 @@ public class House {
                                     && (card3.compareTo(card2) == -1))) {
             currentPlayer.setBankroll(playerBet);
             pot -= playerBet;
-            btwn = true;
+            btwn = true; // Added by Holly for her GUI
         // If third card is not in between the first and second card and is
         // not equal to either of them, the player loses their bet
         } else {
             currentPlayer.setBankroll(-playerBet);
             pot += playerBet;
-            btwn = false;
         }
     }
     
@@ -257,17 +246,10 @@ public class House {
         playerBet = getBetGUI(currentPlayer, input);  // Get player's bet
         card3 = dealCard();                 // Deal the third card
         // If third card matches either first or second card,
-        // player loses twice their bet (if their bankroll has this amount,
-        // otherwise the player busts and their bankroll is added to pot).
-         if (card3.compareTo(card1) == 0 || card3.compareTo(card2) == 0) {
-            if ((2.0 * playerBet) > currentPlayer.getBankroll()) {
-                pot += currentPlayer.getBankroll();
-                currentPlayer.setBankroll(-currentPlayer.getBankroll());
-            } else {
-                currentPlayer.setBankroll(2.0 * -playerBet);
-                pot += (playerBet * 2.0);
-            }
-            btwn = false;
+        // player loses twice their bet
+        if (card3.compareTo(card1) == 0 || card3.compareTo(card2) == 0) {
+            currentPlayer.setBankroll(2.0 * -playerBet);
+            pot += (playerBet * 2.0);
         // If third card is in between first and second card, player wins
         // their bet
         } else if (((card3.compareTo(card1) == -1) 
@@ -276,13 +258,11 @@ public class House {
                                     && (card3.compareTo(card2) == -1))) {
             currentPlayer.setBankroll(playerBet);
             pot -= playerBet;
-            btwn = true;
         // If third card is not in between the first and second card and is
         // not equal to either of them, the player loses their bet
         } else {
             currentPlayer.setBankroll(-playerBet);
             pot += playerBet;
-            btwn = false;
         }
     }
 
@@ -305,8 +285,6 @@ public class House {
      * Description: Private helper method that prompts a player for a bet, then
      * returns that bet. Includes error handling for inappropriate input as
      * well as for when a player attempts to bet more than is in their bankroll.
-     * This method assumes no parsing of the input from the GUI has been 
-     * performed before the method call.
      * 
      * @param player The player who is currently betting
      * @param input The bet amount (a String, parsed in method to double)
@@ -341,8 +319,6 @@ public class House {
      * Description: Private helper method that prompts a player for a bet, then
      * returns that bet. Includes error handling for inappropriate input as
      * well as for when a player attempts to bet more than is in their bankroll.
-     * This version assumes parsing of the input has been done prior to this
-     * method being called.
      * 
      * @param player The player who is currently betting
      * @param input The player's bet (a double)
@@ -369,57 +345,26 @@ public class House {
         return input;
     }
     
-    /*
-        The following code is considered legacy, and is used in the GameDriver
-        program to test functionality of the House and Person classes. It is
-        not used in the GUI version of the game.
-    */
+    // OLD CODE - DO NOT USE
     
-    /**
-     * playHand Method
-     * Description: Given an active player, asks for a player's bet.
-     * It then compares a third card and adds/subtracts from
-     * the player's bankroll and the pot depending on the results:
-     * 
-     * 1. If the third card equals one of the first two cards, the player loses
-     * twice their bet, and this amount is added to the pot
-     * 2. If the third card is in between the first two cards, the player wins
-     * their bet and this amount is subtracted from the pot
-     * 3. If the third card is not in between the first two and is also not
-     * equal to either of the first two, the player loses their bet and this
-     * amount is added to the pot
-     * 
-     * If the player is inactive, the method is exited early.
-     * This method is used exclusively in the GameDriver program to test
-     * functionality of the House and Person classes.
-     * @param currentPlayer
-     * @throws IllegalBetException 
-     */
-    public void playHand(Person currentPlayer) throws IllegalBetException {
+    /*public void playHand(Person currentPlayer) throws IllegalBetException {
         if (!currentPlayer.getActivePlayer()) {
             return;     // If the current player isn't active, skip them
         }
         do {
             card1 = dealCard();             // Deal first card
             card2 = dealCard();             // Deal second card
-        } while (card1.compareTo(card2) == 0);  // Keep dealing until
-        System.out.println("Card 1: " + card1); // card1 != card2
+        } while (card1.compareTo(card2) == 0); // Keep dealing until card1 != card2
+        System.out.println("Card 1: " + card1);
         System.out.println("Card 2: " + card2);
         playerBet = getBet(currentPlayer);  // Get player's bet
         card3 = dealCard();                 // Deal the third card
         System.out.println("Card 3: " + card3);
         // If third card matches either first or second card,
-        // player loses twice their bet (if their bankroll has this amount,
-        // otherwise the player busts and their bankroll is added to pot).
-         if (card3.compareTo(card1) == 0 || card3.compareTo(card2) == 0) {
-            if ((2.0 * playerBet) > currentPlayer.getBankroll()) {
-                pot += currentPlayer.getBankroll();
-                currentPlayer.setBankroll(-currentPlayer.getBankroll());
-            } else {
-                currentPlayer.setBankroll(2.0 * -playerBet);
-                pot += (playerBet * 2.0);
-            }
-            System.out.println("You lose double.");
+        // player loses twice their bet
+        if (card3.compareTo(card1) == 0 || card3.compareTo(card2) == 0) {
+            currentPlayer.setBankroll(2.0 * -playerBet);
+            pot += (playerBet * 2.0);
         // If third card is in between first and second card, player wins
         // their bet
         } else if (((card3.compareTo(card1) == -1) 
@@ -428,28 +373,14 @@ public class House {
                                     && (card3.compareTo(card2) == -1))) {
             currentPlayer.setBankroll(playerBet);
             pot -= playerBet;
-            System.out.println("You win the hand.");
         // If third card is not in between the first and second card and is
         // not equal to either of them, the player loses their bet
         } else {
             currentPlayer.setBankroll(-playerBet);
             pot += playerBet;
-             System.out.println("You lose the hand.");
         }
     }
     
-    /**
-     * getBet Method
-     * Description: Private helper method that prompts a player for a bet, then
-     * returns that bet. Includes error handling for inappropriate input as
-     * well as for when a player attempts to bet more than is in their bankroll.
-     * This method is used exclusively in the GameDriver program to test
-     * functionality of the House and Person classes.
-     * @param player The player who is currently betting
-     * @throws IllegalBetException Checks for players betting more than is
-     * in their bankroll.
-     * @return The player's bet (a double)
-     */
     private double getBet(Person player) throws IllegalBetException {
         // Variables
         Scanner stdin = new Scanner(System.in);
@@ -462,18 +393,16 @@ public class House {
                 bet = stdin.nextDouble();   // Get bet from player
                 // Handle when player's bet is negative
                 if (bet < 0) {
-                    throw new IllegalBetException("Bet can't be negative " + 
-                                                    "or zero!");
+                    throw new IllegalBetException("Bet can't be negative or zero!");
                 }
                 // Handle when player's bet is too low
                 if (bet > 0 && bet < MIN_BET) {
-                    throw new IllegalBetException("Bet must be over minimum " + 
-                                                  "($" + MIN_BET +")!");
+                    throw new IllegalBetException("Bet must be over minimum ($" + 
+                                            MIN_BET +")!");
                 }
                 // Handle when player's bet is over the pot amount
                 if (bet > pot) {
-                    throw new IllegalBetException("Bet can't be more than " + 
-                                                    "the pot!");
+                    throw new IllegalBetException("Bet can't be more than the pot!");
                 }
                 player.setBet(bet); // Sets the player's bet to the input value
                 isValid = true; // If bet is valid, exit the input loop
@@ -481,7 +410,6 @@ public class House {
             catch (IllegalBetException e) {
                 System.out.println(e);
             }
-            // Catch invalid input other than numbers
             catch (Exception e) {
                 System.out.println("Bet must be a valid number!");
                 stdin.nextLine();
@@ -489,5 +417,5 @@ public class House {
         } while (!isValid);
                 
         return bet; 
-    }
+    }*/
 }

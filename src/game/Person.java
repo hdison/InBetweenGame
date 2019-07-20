@@ -1,7 +1,5 @@
 package game;
 
-//EDITED BY HOLLY ON 7/10 
-
 /**
  * Person Class
  * Description: Models a single player in the In-Between game, storing the
@@ -10,8 +8,7 @@ package game;
  * @author Allison Rojewski
  * @date
  */
-public class Person implements Comparable<Person> 
-{
+public class Person implements Comparable<Person> {
     
     // Instance Fields //
     
@@ -47,20 +44,28 @@ public class Person implements Comparable<Person>
      * to false.
      * @param money The amount to add to the player's bankroll (a double)
      */
-    public void setBankroll(double money) 
-    {
+    public void setBankroll(double money) {
         bankroll += money;
         if (bankroll <= 0) {
+            bankroll = 0;
             activePlayer = false;
         }
+    }
+    
+    /**
+     * resetBankroll Mutator
+     * Description: Forces the bankroll to zero to facilitate restarting a
+     * new game in the GUI version of In-Between.
+     */
+    public void resetBankroll() {
+        bankroll = 0.0;
     }
     
     /**
      * setActivePlayer Mutator
      * Description: Reverses the logical value of the activePlayer variable.
      */
-    public void setActivePlayer() 
-    {
+    public void setActivePlayer() {
         activePlayer = !activePlayer;
     }
     
@@ -82,20 +87,16 @@ public class Person implements Comparable<Person>
     
     /**
      * setBet Mutator
-     * Description: Sets the current player's bet to a specified value. 
-     * Throws an IllegalBetException if the bet amount is larger than 
-     * the player's bankroll.
+     * Description: Sets the current player's bet to a specified value. Throws
+     * an IllegalBetException if the bet amount is larger than the player's
+     * bankroll.
      * @param money
      * @throws IllegalBetException Thrown if the bankroll is less than the bet
      */
-    public void setBet(double money) throws IllegalBetException 
-    {
-        if (bankroll >= money) 
-        {
+    public void setBet(double money) throws IllegalBetException {
+        if (bankroll >= money) {
             bet = money;
-        } 
-        else 
-        {
+        } else {
             throw new IllegalBetException("Not enough money for that bet!");
         }
     }
